@@ -5,38 +5,41 @@ semaphoreB = MySemaphore(0, "semaphoreB")
 semaphoreC = MySemaphore(0, "semaphoreC")
 semaphoreD = MySemaphore(0, "semaphoreD")
 
-
 def threadA():
     while True:
         semaphoreA.wait()
-        for i in range(1, 6):
-            print(i)
+        print(1)
         semaphoreB.signal()
-
+        semaphoreA.wait()
+        print(5)
+        semaphoreB.signal()
 
 def threadB():
     while True:
         semaphoreB.wait()
-        for i in range(2, 7):
-            print(i)
+        print(2)
         semaphoreC.signal()
-
+        semaphoreB.wait()
+        print(6)
+        semaphoreC.signal()
 
 def threadC():
     while True:
         semaphoreC.wait()
-        for i in range(3, 8):
-            print(i)
+        print(3)
         semaphoreD.signal()
-
+        semaphoreC.wait()
+        print(7)
+        semaphoreD.signal()
 
 def threadD():
     while True:
         semaphoreD.wait()
-        for i in range(4, 9):
-            print(i)
+        print(4)
         semaphoreA.signal()
-
+        semaphoreD.wait()
+        print(8)
+        semaphoreA.signal()
 
 def setup():
     subscribe_thread(threadA)
