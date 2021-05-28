@@ -1,5 +1,5 @@
 ### Symmetric solution using variables
-```
+```python
 semaphore1 = semaphore(0)
 mutex1 = semaphore(1)
 
@@ -10,7 +10,8 @@ toggle1 = false
 toggle2 = true
 ```
 
-```
+```python
+
 function Barrier()
 {
     while(true)
@@ -103,4 +104,44 @@ function Barrier()
         mutex3.signal()
     }
 }
+```
+
+## Provided solution
+```python
+semaphore1 = semaphore(0)
+semaphore2 = semaphore(0)
+semaphore3 = semaphore(0)
+```
+
+```python
+def Thread_1():
+    semaphore1.signal()
+    semaphore2.signal()
+    semaphore3.signal()
+
+    semaphore1.wait()
+    semaphore1.wait()
+    semaphore1.wait()
+```
+
+```python
+def Thread_2():
+    semaphore1.signal()
+    semaphore2.signal()
+    semaphore3.signal()
+
+    semaphore2.wait()
+    semaphore2.wait()
+    semaphore2.wait()
+```
+
+```python
+def Thread_3():
+    semaphore1.signal()
+    semaphore2.signal()
+    semaphore3.signal()
+
+    semaphore3.wait()
+    semaphore3.wait()
+    semaphore3.wait()
 ```
