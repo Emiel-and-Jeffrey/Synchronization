@@ -51,7 +51,7 @@ function Barrier()
 }
 ```
 
-### Symmetric solution using only semaphores
+### Reusable symmetric solution using only semaphores
 ```
 semaphore1 = semaphore(0)
 mutex1 = semaphore(1)
@@ -106,7 +106,7 @@ function Barrier()
 }
 ```
 
-## Provided solution
+### Provided solution
 ```python
 semaphore1 = semaphore(0)
 semaphore2 = semaphore(0)
