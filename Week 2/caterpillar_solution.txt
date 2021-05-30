@@ -1,0 +1,49 @@
+the barrier must hold n-1 threads, until the n'th thread arrives
+which unlocks the firs gate of the barrier and locks the second
+
+n = 4
+
+semaphore1 = -1
+semaphore2 = -1
+semaphore3 = -1
+
+
+1| semaphore1.signal()
+2| semaphore1.wait()
+
+3| semaphore2.signal()
+4| semaphore2.wait()
+
+5| semaphore3.signal()
+6| semaphore3.wait()
+
+if(!toggle)
+{
+	toggle = true
+	//release all semaphores
+}
+
+//critical section
+
+		semaphore1	semaphore2	semaphore3
+		-1			-1			-1
+A1		0			-1			-1
+A2		-1			-1			-1
+B1		0			-1			-1
+A3		0			0			-1
+A4		0			-1			-1
+B2		-1			-1			-1
+C1		0			-1			-1
+B3		0			0			-1
+A5		0			0			0
+A6		0			0			-1
+B4		0			-1			-1
+C2		-1			-1			-1
+D1		0			-1			-1
+C3		0			0			-1
+B5		0			0			0
+A7		0			0			0
+A8		0			0			0
+B6		0			0			-1
+C4		0			-1			-1
+D2		-1			-1			-1
