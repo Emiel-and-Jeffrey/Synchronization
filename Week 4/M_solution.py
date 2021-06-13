@@ -6,26 +6,13 @@ VEGETARIAN = 1
 
 NR_O_SERVINGS = 5
 
-#simplify problem by making sure cooks can always add servings to pot regardless of type
-servings = MyBag(size=NR_O_SERVINGS*2)
+# simplify problem by making sure cooks can always add servings to pot regardless of type
+servings = MyBag(size=NR_O_SERVINGS * 2)
 
-mutex = MyMutex()
-empty_pot = [MySemaphore(1), MySemaphore(1)]
-condition_variables = [MyConditionVariable(mutex), MyConditionVariable(mutex)]
+mutex = MyMutex("PotMutex")
+empty_pot = [MySemaphore(1, "CarnivorePot"), MySemaphore(1, "VegetarianPot")]
+condition_variables = [MyConditionVariable(mutex, "CarnivorePotCV"), MyConditionVariable(mutex, "VegetarianPotCV")]
 
-def food_left(savage_type):
-    if savage_type == CARNIVORE:
-        return servings.contains("meat")
-    else:
-        return servings.contains("vegetable")
-
-def get_food(savage_type):
-    if savage_type == CARNIVORE:
-        servings.get("meat")
-        return "meat"
-    else:
-        servings.get("vegetable")
-        return "vegetable"
 
 def put_food(savage_type):
     if savage_type == CARNIVORE:
@@ -34,6 +21,7 @@ def put_food(savage_type):
     else:
         for i in range(NR_O_SERVINGS):
             servings.put("vegetable")
+
 
 def cook_thread(savage_type):
     while True:
@@ -47,13 +35,29 @@ def cook_thread(savage_type):
 
         mutex.signal()
 
+
+def food_left(savage_type):
+    if savage_type == CARNIVORE:
+        return servings.contains("meat")
+    else:
+        return servings.contains("vegetable")
+
+
+def get_food(savage_type):
+    if savage_type == CARNIVORE:
+        servings.get("meat")
+        return "meat"
+    else:
+        servings.get("vegetable")
+        return "vegetable"
+
 def savage_thread(savage_type):
     while True:
         mutex.wait()
 
         while not food_left(savage_type):
             condition_variables[savage_type].wait()
-        
+
         food = get_food(savage_type)
         if not food_left(savage_type):
             empty_pot[savage_type].signal()
@@ -61,6 +65,7 @@ def savage_thread(savage_type):
         mutex.signal()
 
         print("eating " + food)
+
 
 def setup():
     subscribe_thread(lambda: cook_thread(CARNIVORE))
