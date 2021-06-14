@@ -34,10 +34,11 @@ def reader_thread():
 
         readers_busy.v -= 1
 
-        if writer_priority.v and writers_waiting.v > 0:
-            cv_writer.notify()
-        else:
-            cv_reader.notify_all()
+        if readers_busy.v == 0:
+            if writer_priority.v and writers_waiting.v > 0:
+                cv_writer.notify()
+            elif readers_waiting.v > 0:
+                cv_reader.notify_all()
 
         mutex.signal()
 
@@ -65,7 +66,7 @@ def writer_thread():
 
         if writer_priority.v and writers_waiting.v > 0:
             cv_writer.notify()
-        else:
+        elif readers_waiting.v > 0:
             cv_reader.notify_all()
         mutex.signal()
 
@@ -73,5 +74,5 @@ def writer_thread():
 def setup():
     for i in range(7):
         subscribe_thread(reader_thread)
-    for i in range(7):
+    for i in range(1):
         subscribe_thread(writer_thread)
