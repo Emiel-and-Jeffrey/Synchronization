@@ -28,17 +28,13 @@ def reader_thread():
 
         mutex.signal()
 
-        print("reading...")
-
         mutex.wait()
 
         readers_busy.v -= 1
 
         if readers_busy.v == 0:
-            if writer_priority.v and writers_waiting.v > 0:
+            if (writer_priority.v and writers_waiting.v > 0) or (writers_waiting.v > 0 and readers_waiting.v == 0):
                 cv_writer.notify()
-            elif readers_waiting.v > 0:
-                cv_reader.notify_all()
 
         mutex.signal()
 
@@ -58,17 +54,20 @@ def writer_thread():
 
         mutex.signal()
 
-        print("writing...")
-
         mutex.wait()
 
         writers_busy.v -= 1
 
-        if writer_priority.v and writers_waiting.v > 0:
-            cv_writer.notify()
-        elif readers_waiting.v > 0:
+        if readers_waiting.v > 0 and not writer_priority.v:
             cv_reader.notify_all()
+        elif writers_waiting.v > 0:
+            cv_writer.notify()
         mutex.signal()
+        roads = []
+        intersections = []
+
+        for i in range(9):
+            intersections.append(new )
 
 
 def setup():
