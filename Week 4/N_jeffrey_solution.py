@@ -10,7 +10,7 @@ readers_busy = MyInt(0, "reader_busy")
 writers_waiting = MyInt(0, "writers_waiting")
 writers_busy = MyInt(0, "writer_busy")
 
-writer_priority = MyBool(True, "writer_priority")
+writer_priority = MyBool(False, "writer_priority")
 
 
 def reader_thread():
@@ -63,15 +63,10 @@ def writer_thread():
         elif writers_waiting.v > 0:
             cv_writer.notify()
         mutex.signal()
-        roads = []
-        intersections = []
-
-        for i in range(9):
-            intersections.append(new )
 
 
 def setup():
-    for i in range(7):
-        subscribe_thread(reader_thread)
     for i in range(1):
+        subscribe_thread(reader_thread)
+    for i in range(7):
         subscribe_thread(writer_thread)
