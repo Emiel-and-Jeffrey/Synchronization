@@ -12,7 +12,7 @@ nrof_writer_wait = MyInt(0,"writer_wait")
 nrof_reader_busy = MyInt(0,"reader_busy")
 nrof_writer_busy = MyInt(0,"writer_busy")
 
-writer_prio = MyBool(True,"writer_prio")
+writer_prio = MyBool(False,"writer_prio")
 
 def reader_thread():
 	while True:
@@ -21,7 +21,7 @@ def reader_thread():
 		
 		nrof_reader_wait.v += 1
 
-		while nrof_writer_busy.v > 0 and (writer_prio and nrof_writer_wait > 0):
+		while nrof_writer_busy.v > 0 or (writer_prio.v and nrof_writer_wait.v > 0):
 			cv_reader.wait()
 		
 		nrof_reader_wait.v -= 1
@@ -36,10 +36,13 @@ def reader_thread():
 		nrof_reader_busy.v -= 1
 		
 		if writer_prio.v:
-			if nr_writer_wait.v > 0:
+			if nrof_writer_wait.v > 0:
+				cv_writer.notify()
+		else:
+			if nrof_reader_wait.v == 0 and nrof_writer_wait.v > 0:
 				cv_writer.notify()
 		
-		mutex.signal()	
+		mutex.signal()
 
 def writer_thread():
 	while True:
@@ -48,7 +51,7 @@ def writer_thread():
 		
 		nrof_writer_wait.v += 1
 		
-		while nrof_writer_busy.v > 0 and nrof_reader_busy.v > 0:
+		while nrof_writer_busy.v > 0 or nrof_reader_busy.v > 0:
 			cv_writer.wait()
 		
 		nrof_writer_wait.v -= 1
@@ -63,13 +66,12 @@ def writer_thread():
 		nrof_writer_busy.v -= 1
 		
 		if writer_prio.v:
-			if nr_writer_wait.v > 0:
+			if nrof_writer_wait.v > 0:
 				cv_writer.notify()
 			else:
-				turnstile.signal()
 				cv_reader.notify_all()
 		else:
-			if nr_reader_wait.v > 0:
+			if nrof_reader_wait.v > 0:
 				cv_reader.notify_all()
 			else:
 				cv_writer.notify()
@@ -77,7 +79,10 @@ def writer_thread():
 		mutex.signal()
 
 def setup():
-	# subscribe_thread(reader_thread)
-	# subscribe_thread(reader_thread)
 	subscribe_thread(reader_thread)
-	# subscribe_thread(writer_thread)
+	subscribe_thread(reader_thread)
+	subscribe_thread(reader_thread)
+	subscribe_thread(writer_thread)
+	subscribe_thread(writer_thread)
+	subscribe_thread(writer_thread)
+	subscribe_thread(writer_thread)
