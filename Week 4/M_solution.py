@@ -28,6 +28,7 @@ def cook_thread(savage_type):
         empty_pot[savage_type].wait()
 
         mutex.wait()
+        # could have waited for a condition variable in here
 
         put_food(savage_type)
 
